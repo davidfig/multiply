@@ -1,7 +1,9 @@
 .clock {
     position: absolute;
-    top: 1rem;
-    right: 1rem;
+    top: calc(50% - 8rem);
+    left: 50%;
+    transform: translate(-50%, -50%);
     width: 10rem;
     height: 10rem;
+    z-index: 1
 }

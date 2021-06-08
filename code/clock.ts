@@ -43,7 +43,7 @@ class Clock {
 
             // draw gray arc
             this.context.beginPath()
-            this.context.fillStyle = 'lightgray'
+            this.context.fillStyle = 'rgba(200,200,200,0.75)'
             this.context.moveTo(centerX, centerY)
             this.context.lineTo(centerX + Math.cos(angle) * arcSize, centerY + Math.sin(angle) * arcSize)
             this.context.arc(centerX, centerY, arcSize, angle, Math.PI * 2 - Math.PI / 2, false)

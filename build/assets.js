@@ -1,8 +1,8 @@
 import fs from 'fs-extra'
 import path from 'path'
 
+const title = 'Multiplication Table'
 const publicDir = 'public/'
-const title = 'Castles'
 
 const exceptions = ['index.html']
 

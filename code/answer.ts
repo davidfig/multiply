@@ -1,9 +1,18 @@
 import random from 'yy-random'
 import { answers } from './answers'
+import { problem } from './problem'
 import { Point } from './util'
 
 const SPEED = 0.1
 const CLEAR_SPEED = 0.75
+const ANSWER_SPEED = 0.5
+
+enum AnswerState {
+    normal,
+    clearing,
+    answering,
+    stopped,
+}
 
 export class Answer {
     private div: HTMLElement
@@ -12,8 +21,7 @@ export class Answer {
     private to: Point
     private velocity: Point
     private time: number
-    private clearing = false
-    private stop = false
+    private state: AnswerState
     number: number
     selected = false
 
@@ -22,7 +30,7 @@ export class Answer {
         this.div = document.createElement('div')
         this.div.className = 'number'
         this.div.innerHTML = n.toString()
-        this.div.addEventListener('pointerdown', () => answers.pressed(this))
+        this.div.addEventListener('pointerdown', (e: PointerEvent) => this.press(e))
         answers.div.appendChild(this.div)
         const find = this.findPlace()
         this.x = find.x
@@ -30,9 +38,24 @@ export class Answer {
         this.nextMove()
     }
 
+    private press(e: PointerEvent) {
+        this.state = AnswerState.answering
+        this.to = problem.getDigit()
+        const element = window.getComputedStyle(this.div, null)
+        const paddingLeft = parseInt(element.getPropertyValue('padding-left'))
+        const paddingTop = parseInt(element.getPropertyValue('padding-top'))
+        this.to.x -= paddingLeft
+        this.to.y -= paddingTop
+        this.nextMove(ANSWER_SPEED)
+        this.div.classList.add('number-selected')
+        answers.pressed(this)
+        e.stopPropagation()
+        e.preventDefault()
+    }
+
     clear() {
-        if (!this.selected && !this.clearing) {
-            this.clearing = true
+        if (this.state === AnswerState.normal) {
+            this.state = AnswerState.clearing
             const distance = Math.max(window.innerWidth, window.innerHeight)
             const angle = random.angle()
             this.to = { x: Math.cos(angle) * distance, y: Math.sin(angle) * distance }
@@ -47,12 +70,15 @@ export class Answer {
         return { x, y }
     }
 
-    nextMove() {
-        this.to = this.findPlace()
+    nextMove(speed?: number) {
+        if (!speed) {
+            this.to = this.findPlace()
+        }
         const distance = Math.sqrt(Math.pow(this.to.x - this.x, 2) + Math.pow(this.to.y - this.y, 2))
         const angle = Math.atan2(this.to.y - this.y, this.to.x - this.x)
-        this.velocity = { x: Math.cos(angle) * SPEED, y: Math.sin(angle) * SPEED }
-        this.time = distance / SPEED
+        speed = speed || SPEED
+        this.velocity = { x: Math.cos(angle) * speed, y: Math.sin(angle) * speed }
+        this.time = distance / speed
     }
 
     set x(x: number) {
@@ -81,14 +107,14 @@ export class Answer {
     }
 
     update(elapsed: number) {
-        if (!this.stop) {
+        if (this.state !== AnswerState.stopped) {
             this.time -= elapsed
             if (this.time < 0) {
-                if (this.clearing) {
-                    this.stop = true
+                this.x = this.to.x
+                this.y = this.to.y
+                if ([AnswerState.clearing, AnswerState.answering].includes(this.state)) {
+                    this.state = AnswerState.stopped
                 } else {
-                    this.x = this.to.x
-                    this.y = this.to.y
                     this.nextMove()
                 }
             } else {

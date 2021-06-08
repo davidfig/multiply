@@ -1,4 +1,10 @@
+@font-face {
+    font-family: 'FONT';
+    src: url(fonts/RobotoMono-VariableFont_wght.ttf);
+}
+
 body {
+    font-family: FONT;
     margin: 0;
     width: 100vw;
     height: 100vh;

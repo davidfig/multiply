@@ -1,5 +1,16 @@
-interface IDataSave {
+interface IResultSave {
+    key: string
+    lastSeen: number
+    level: number
+}
 
+interface IPlayerSave {
+    name: string
+    results: IResultSave[]
+}
+
+interface IDataSave {
+    players: IPlayerSave[]
 }
 
 interface IResult {
@@ -7,20 +18,90 @@ interface IResult {
     level: number
 }
 
+interface ResultMap {
+    [key: string]: IResult
+}
+
 interface IPlayer {
     name: string
-    results: IResult
+    results: ResultMap
 }
 
 export class Data {
-    private players: IPlayer[]
-    constructor(save?: IDataSave) {
-        if (save) {
+    private players: IPlayer[] = []
+    private current: IPlayer
 
+    valid(name: string): boolean {
+        if (name.length === 0) {
+            return false
+        }
+        for (const player of this.players) {
+            if (player.name === name) {
+                return true
+            }
+        }
+        return false
+    }
+
+    add(name: string) {
+        const player = { name, results: {} }
+        this.players.push(player)
+        this.current = player
+    }
+
+    key(a: number, b: number) {
+        return `${a}x${b}`
+    }
+
+    getResult(a: number, b: number): IResult {
+        let result = this.current.results[this.key(a, b)]
+        if (!result) {
+            result = this.current.results[this.key(a, b)] = { lastSeen: 0, level: 0 }
+        }
+        return result
+    }
+
+    success(a: number, b: number) {
+        const result = this.getResult(a, b)
+        result.lastSeen = Date.now()
+        result.level++
+    }
+
+    failure(a: number, b: number) {
+        const result = this.getResult(a, b)
+        result.lastSeen = Date.now()
+        result.level++
+    }
+
+    save(): IDataSave {
+        const players: IPlayerSave[] = []
+        const save = { players } as IDataSave
+        for (const player of this.players) {
+            const playerSave = {
+                name: player.name,
+                results: [],
+            } as IPlayerSave
+            for (const key in player.results) {
+                const result = player.results[key]
+                playerSave.results.push({
+                    key,
+                    ...result,
+                } as IResultSave)
+            }
+            save.players.push(playerSave)
+        }
+        return save
+    }
+
+    load(load: IDataSave) {
+        this.players = []
+        for (const playerSave of load.players) {
+            const player = { name: playerSave.name, results: {} }
+            for (const result of playerSave.results) {
+                player.results[result.key] = { lastSeen: result.lastSeen, level: result.level }
+            }
         }
     }
-
-    create() {
-
-    }
 }
+
+export const data = new Data()

@@ -1,0 +1,7 @@
+.number {
+    position: absolute;
+    font-size: 4rem;
+    background: rgb(240,240,240);
+    padding: 0.5rem 2rem;
+    border-radius: 50%;
+}

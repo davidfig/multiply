@@ -6,9 +6,20 @@
     left: 0;
 }
 
-.progress-dot {
+.progress-test {
+    width: fit-content;
+}
+
+.progress-number {
     position: absolute;
-    border-radius: 50%;
-    background: black;
-    opacity: 0.5
+    opacity: 0.5;
+    vertical-align: center;
+}
+
+.progress-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
 }

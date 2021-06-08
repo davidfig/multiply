@@ -1,7 +1,9 @@
 .number {
     position: absolute;
     font-size: 4rem;
-    background: rgb(240,240,240);
-    padding: 0.5rem 2rem;
+    background: lightgray;
+    color: white;
+    padding: 0.5rem 1.85rem;
     border-radius: 50%;
+    cursor: pointer;
 }

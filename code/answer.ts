@@ -14,12 +14,15 @@ export class Answer {
     private time: number
     private clearing = false
     private stop = false
+    number: number
     selected = false
 
     constructor(n: number) {
+        this.number = n
         this.div = document.createElement('div')
         this.div.className = 'number'
         this.div.innerHTML = n.toString()
+        this.div.addEventListener('pointerdown', () => answers.pressed(this))
         answers.div.appendChild(this.div)
         const find = this.findPlace()
         this.x = find.x

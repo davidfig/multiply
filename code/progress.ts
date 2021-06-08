@@ -1,7 +1,8 @@
+import random from 'yy-random'
 import { tables } from './settings'
 import { Point } from './util'
 
-const PADDING = 0.25
+const PADDING = 10
 
 interface ProgressElement extends HTMLDivElement {
     x?: number
@@ -10,88 +11,91 @@ interface ProgressElement extends HTMLDivElement {
 
 class Progress {
     private div: HTMLElement
+    private canvas: HTMLCanvasElement
+    private context: CanvasRenderingContext2D
+    private maxSizeX: number
+    private xSize: number
+    private ySize: number
 
     init() {
+        this.canvas = document.createElement('canvas')
+        this.canvas.className = 'progress-canvas'
+        this.context = this.canvas.getContext('2d')
+        document.body.appendChild(this.canvas)
         this.div = document.createElement('div')
         this.div.className = 'progress'
-        this.redraw()
         document.body.appendChild(this.div)
+        this.testSize()
+        this.redraw()
+    }
+
+    showProblem(a: number, b: number) {
+        this.context.beginPath()
+        const color = 'rgb(0,0,0,0.15)'
+        this.context.fillStyle = color
+        this.context.rect(0, this.ySize * (a + 1) - this.ySize / 2, this.xSize * (b + 0.5), this.ySize)
+        this.context.rect(this.xSize * (b + 1) - this.xSize / 2, 0, this.xSize, this.ySize * (a + 0.5))
+        this.context.fill()
+        this.context.beginPath()
+        this.context.strokeStyle = 'gray'
+        this.context.rect(this.xSize * (b + 0.5), this.ySize * (a + 0.5), this.xSize, this.ySize)
+        this.context.stroke()
+    }
+
+    showResults() {
+        for (let x = 0; x <= tables; x++) {
+            for (let y = 0; y <= tables; y++) {
+                const result = random.get(1, true)
+                this.context.beginPath()
+                this.context.fillStyle = `rgba(0,255,0,${result * 0.5})`
+                this.context.rect(this.xSize * (x + 0.5), this.ySize * (y + 0.5), this.xSize, this.ySize)
+                this.context.fill()
+            }
+        }
+    }
+
+    show(a: number, b: number) {
+        const resolution = window.devicePixelRatio
+        this.canvas.width = this.canvas.offsetWidth * resolution
+        this.canvas.height = this.canvas.offsetHeight * resolution
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
+        this.context.scale(resolution, resolution)
+        this.showResults()
+        this.showProblem(a, b)
+    }
+
+    testSize() {
+        const test = document.createElement('div')
+        test.className = 'progress-test'
+        document.body.appendChild(test)
+        test.innerHTML = '88'
+        this.maxSizeX = test.offsetWidth
+        test.remove()
+    }
+
+    add(n: number, direction: 'top' | 'left') {
+        const number = document.createElement('div')
+        number.className = 'progress-number'
+        number.innerHTML = n.toString()
+        this.div.appendChild(number)
+        if (direction === 'top') {
+            number.style.left = `${this.xSize * (n + 1) - number.offsetWidth / 2}px`
+            number.style.top = `${PADDING}px`
+        } else {
+            number.style.left = `${PADDING + this.maxSizeX / 2 - number.offsetWidth / 2}px`
+            number.style.top = `${this.ySize * (n + 1) - number.offsetHeight / 2}px`
+        }
     }
 
     redraw() {
-        const totalProblems = (tables + 1) * (tables + 1)
-        const totalPerimeter = window.innerWidth * 2 + window.innerHeight * 2
-        let size = totalPerimeter / totalProblems
-        let more: boolean
-        let top: number, bottom: number, right: number, left: number
-        do {
-            top = Math.floor(window.innerWidth / size)
-            bottom = top - 1
-            right = Math.floor(window.innerHeight / size) - 1
-            left = right - 1
-            if (top + bottom + right + left < totalProblems) {
-                size -= 0.1
-                more = true
-            } else {
-                more = false
-            }
-        } while (more)
-        const dotSize = size * (1 - PADDING)
-        let s = ''
-        for (let i = 0; i < totalProblems; i++) {
-            s += `<div class="progress-dot" style="width: ${dotSize}px; height: ${dotSize}px"></div>`
+        this.xSize = window.innerWidth / (tables + 2)
+        this.ySize = window.innerHeight / (tables + 2)
+        for (let x = 0; x <= tables; x++) {
+            this.add(x, 'top')
         }
-        this.div.innerHTML = s
-        let place = 'top'
-        let index = 0
-        const padding = size * PADDING
-        let x = padding
-        let y = padding
-        let lastX: number
-        let lastY: number
-        let count = 0
-        let horizontalCount = 0
-        let verticalCount = 1
-        while (index < this.div.children.length) {
-            const dot = this.div.children[index] as ProgressElement
-            dot.style.transform = `translate(${x}px, ${y}px)`
-            dot.x = x
-            dot.y = y
-            count++
-            if (place === 'top') {
-                horizontalCount++
-                x += size
-                if (--top === 0) {
-                    lastX = x - size
-                    place = 'right'
-                    x = lastX
-                    y = size + padding
-                }
-            } else if (place === 'right') {
-                verticalCount++
-                y += size
-                if (--right === 0) {
-                    lastY = y - size
-                    place = 'bottom'
-                    x = lastX - size
-                    y = lastY
-                }
-            } else if (place === 'bottom') {
-                x -= size
-                if (--bottom === 0) {
-                    place = 'left'
-                    x = padding
-                    y = lastY - size
-                }
-            } else if (place === 'left') {
-                y -= size
-                if (--left === 0) {
-                    break
-                }
-            }
-            index++
+        for (let y = 0; y <= tables; y++) {
+            this.add(y, 'left')
         }
-        // this.div.style.transform = `translate(${(window.innerWidth - horizontalCount * size) / 2}px, ${(window.innerHeight - verticalCount * size) / 2}px)`
     }
 
     get(index: number): Point {

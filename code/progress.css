@@ -4,10 +4,15 @@
     height: 100vh;
     top: 0;
     left: 0;
+    opacity: 0;
 }
 
 .progress-test {
     width: fit-content;
+}
+
+.progress-numbers {
+    opacity: 0;
 }
 
 .progress-number {

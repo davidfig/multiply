@@ -50,19 +50,8 @@ class Problem {
         el('.problem-b').innerHTML = problem.b.toString()
         el('.problem-answer-1').innerHTML = '?'
         el('.problem-answer-2').innerHTML = ''
-        // const start = progress.get(problem.index)
-        // this.size = { x: this.div.offsetWidth, y: this.div.offsetHeight }
-        // const scale = 0.1
-        // this.div.style.transform = `translate(${start.x - this.size.x / 2}px, ${start.y - this.size.y / 2}px) scale(${scale}) `
-        // el('.problem-wrapper').style.transform = 'scale(0.1) translate(-50%, -50%)'
-        // animejs({
-        //     targets: [this.div],
-        //     translateX: window.innerWidth / 2,
-        //     translateY: window.innerHeight / 2,
-        //     duration: 2000,
-        // })
-        progress.show(problem.a, problem.b)
-        answers.show(problem.a, problem.b)
+        this.div.classList.add('problem-hide')
+        answers.show()
         this.firstDigit = true
     }
 

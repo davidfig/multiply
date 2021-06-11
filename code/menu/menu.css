@@ -1,0 +1,39 @@
+.menu {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: none;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+}
+
+.menu-title {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+}
+
+.menu-add {
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+}
+
+.menu-add-player-submit {
+    cursor: pointer;
+}
+
+.menu-add-player {
+    font-size: 1rem;
+}
+
+.menu-add-player-invalid {
+    color: red;
+}
+
+.menu-player {
+    font-size: 1.5rem;
+    margin: 2rem;
+    cursor: pointer;
+}

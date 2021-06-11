@@ -1,11 +1,13 @@
 import { FPS } from 'yy-fps'
-import { problem } from './problem'
+import { menu } from './menu/menu'
+import { game } from './game/game'
 
 class State {
     private fps: FPS
     private _state: string
     private states = {
-        problem,
+        menu,
+        game,
     }
     private lastTime: number
 
@@ -13,7 +15,7 @@ class State {
         for (const key in this.states) {
             this.states[key].init()
         }
-        this.state = 'problem'
+        this.state = 'game'
         this.lastTime = performance.now()
         this.fps = new FPS()
         requestAnimationFrame(() => this.update())

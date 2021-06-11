@@ -1,78 +1,45 @@
-import animejs from 'animejs'
-import { el } from './el'
-import { answers } from './answers'
-import { clock } from './clock'
-import { progress } from './progress'
-import { Point } from './util'
+import { el } from '../el'
+import { Game } from './game'
 
 class Problem {
+    private game: Game
     private div: HTMLElement
-    private size: Point
     firstDigit: boolean = true
-    answer: number
 
-    init() {
-        progress.init()
-        clock.init()
-        answers.init()
+    init(game: Game) {
+        this.game = game
         this.div = document.createElement('div')
         this.div.className = 'problem'
         this.div.innerHTML = '<span class="problem-a"></span> &#xd7; <span class="problem-b"></span>' +
             ' = <span class="problem-answer problem-answer-1"></span><span class="problem-answer problem-answer-2"></span>'
-        document.body.appendChild(this.div)
+        el('.game').appendChild(this.div)
     }
 
     getDigit(): DOMRect {
         const span = el(`.problem-answer-${this.firstDigit ? '1' : '2'}`) as HTMLSpanElement
         if (this.firstDigit) {
             el('.problem-answer-1').classList.add('problem-answer-fade')
-            if (this.answer.toString().length === 2) {
+            if (this.game.problem.answer.toString().length === 2) {
                 el('.problem-answer-2').innerText = '?'
-            } else {
-                this.end()
             }
         } else {
             el('.problem-answer-2').classList.add('problem-answer-fade')
-            this.end()
         }
         this.firstDigit = false
         return span.getBoundingClientRect()
     }
 
-    findProblem(): { a: number, b: number } {
-        return { a: 9, b: 3 }
-    }
-
     show() {
-        const problem = this.findProblem()
-        this.answer = problem.a * problem.b
-        el('.problem-a').innerHTML = problem.a.toString()
-        el('.problem-b').innerHTML = problem.b.toString()
+        el('.problem-a').innerHTML = this.game.problem.a.toString()
+        el('.problem-b').innerHTML = this.game.problem.b.toString()
         el('.problem-answer-1').innerHTML = '?'
         el('.problem-answer-2').innerHTML = ''
         this.div.classList.add('problem-hide')
-        answers.show()
         this.firstDigit = true
     }
 
-    clear() {
-        answers.clear()
-        clock.stop()
-    }
-
-    checkAnswer(n: number) {
-        if (n === this.answer) {
-
-        }
-    }
-
-    update(elapsed: number) {
-        clock.update(elapsed)
-        answers.update(elapsed)
-    }
-
-    end() {
-        answers.clear()
+    start() {
+        this.div.classList.remove('problem-hide')
     }
 }
 

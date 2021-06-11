@@ -1,6 +1,7 @@
 import random from 'yy-random'
-import { tables } from './settings'
-import { Point } from './util'
+import { el } from '../el'
+import { tables } from '../settings'
+import { Point } from '../util'
 
 const PADDING = 10
 
@@ -21,12 +22,24 @@ class Progress {
         this.canvas = document.createElement('canvas')
         this.canvas.className = 'progress-canvas'
         this.context = this.canvas.getContext('2d')
-        document.body.appendChild(this.canvas)
+        el('.game').appendChild(this.canvas)
         this.div = document.createElement('div')
         this.div.className = 'progress'
-        document.body.appendChild(this.div)
+        el('.game').appendChild(this.div)
         this.testSize()
-        this.redraw()
+        this.showNumbers()
+        this.resize()
+        this.showResults()
+    }
+
+    resize() {
+        const resolution = window.devicePixelRatio
+        this.canvas.width = this.canvas.offsetWidth * resolution
+        this.canvas.height = this.canvas.offsetHeight * resolution
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
+        this.context.restore()
+        this.context.save()
+        this.context.scale(resolution, resolution)
     }
 
     showProblem(a: number, b: number) {
@@ -55,12 +68,7 @@ class Progress {
     }
 
     show(a: number, b: number) {
-        const resolution = window.devicePixelRatio
-        this.canvas.width = this.canvas.offsetWidth * resolution
-        this.canvas.height = this.canvas.offsetHeight * resolution
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
-        this.context.scale(resolution, resolution)
-        this.showResults()
         this.showProblem(a, b)
     }
 
@@ -87,7 +95,7 @@ class Progress {
         }
     }
 
-    redraw() {
+    showNumbers() {
         this.xSize = window.innerWidth / (tables + 2)
         this.ySize = window.innerHeight / (tables + 2)
         for (let x = 0; x <= tables; x++) {

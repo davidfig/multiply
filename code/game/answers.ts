@@ -1,3 +1,4 @@
+import { el } from '../el'
 import { Answer } from './answer'
 import { problem } from './problem'
 
@@ -8,7 +9,7 @@ class Answers {
     init() {
         this.div = document.createElement('div')
         this.div.className = 'answers'
-        document.body.appendChild(this.div)
+        el('.game').appendChild(this.div)
     }
 
     show() {

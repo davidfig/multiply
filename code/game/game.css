@@ -1,0 +1,9 @@
+.game {
+    display: none;
+    transition: opacity 2s;
+}
+
+.game-show {
+    display: block;
+    opacity: 1;
+}

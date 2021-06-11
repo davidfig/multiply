@@ -9,8 +9,9 @@ interface IPlayerSave {
     results: IResultSave[]
 }
 
-interface IDataSave {
+export interface IDataSave {
     players: IPlayerSave[]
+    current: number
 }
 
 interface IResult {
@@ -28,25 +29,31 @@ interface IPlayer {
 }
 
 export class Data {
-    private players: IPlayer[] = []
-    private current: IPlayer
+    players: IPlayer[] = []
+    current: IPlayer
+    dirty: boolean = false
 
-    valid(name: string): boolean {
+    isValid(name: string): boolean {
         if (name.length === 0) {
             return false
         }
         for (const player of this.players) {
             if (player.name === name) {
-                return true
+                return false
             }
         }
-        return false
+        return true
+    }
+
+    setCurrent(name: string) {
+        this.current = this.players.find(player => player.name === name)
     }
 
     add(name: string) {
         const player = { name, results: {} }
         this.players.push(player)
         this.current = player
+        this.dirty = true
     }
 
     key(a: number, b: number) {
@@ -74,6 +81,7 @@ export class Data {
     }
 
     save(): IDataSave {
+        debugger
         const players: IPlayerSave[] = []
         const save = { players } as IDataSave
         for (const player of this.players) {
@@ -90,6 +98,7 @@ export class Data {
             }
             save.players.push(playerSave)
         }
+        save.current = this.players.indexOf(this.current)
         return save
     }
 
@@ -100,7 +109,9 @@ export class Data {
             for (const result of playerSave.results) {
                 player.results[result.key] = { lastSeen: result.lastSeen, level: result.level }
             }
+            this.players.push(player)
         }
+        this.current = this.players[load.current]
     }
 }
 

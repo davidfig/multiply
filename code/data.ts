@@ -1,3 +1,7 @@
+import random from 'yy-random'
+import { design, tables } from './settings'
+import { IProblem } from './game/game'
+
 interface IResultSave {
     key: string
     lastSeen: number
@@ -68,20 +72,35 @@ export class Data {
         return result
     }
 
-    success(a: number, b: number) {
-        const result = this.getResult(a, b)
-        result.lastSeen = Date.now()
-        result.level++
+    findProblem(): IProblem | false {
+        const now = Date.now()
+        const all = []
+        for (let a = 0; a <= tables; a++) {
+            for (let b = 0; b <= tables; b++) {
+                const result = this.getResult(a, b)
+                if (result.level === 0 || now < result.lastSeen + design[result.level].next) {
+                    all.push({ a, b, answer: a * b, time: design[result.level].time })
+                }
+            }
+        }
+        if (all.length === 0) {
+            return false
+        } else {
+            return random.pick(all, false)
+        }
     }
 
-    failure(a: number, b: number) {
+    correctAnswer(a: number, b: number) {
         const result = this.getResult(a, b)
         result.lastSeen = Date.now()
         result.level++
+        this.dirty = true
+    }
+
+    wrongAnswer() {
     }
 
     save(): IDataSave {
-        debugger
         const players: IPlayerSave[] = []
         const save = { players } as IDataSave
         for (const player of this.players) {

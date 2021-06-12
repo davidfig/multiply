@@ -1,7 +1,7 @@
-import random from 'yy-random'
 import { el } from '../el'
-import { tables } from '../settings'
+import { tables, levels } from '../settings'
 import { Point } from '../util'
+import { data } from '../data'
 
 const PADDING = 10
 
@@ -12,63 +12,79 @@ interface ProgressElement extends HTMLDivElement {
 
 class Progress {
     private div: HTMLElement
-    private canvas: HTMLCanvasElement
-    private context: CanvasRenderingContext2D
+    private progress: HTMLDivElement
+    private problem: HTMLCanvasElement
+    private results: HTMLCanvasElement
     private maxSizeX: number
     private xSize: number
     private ySize: number
 
     init() {
-        this.canvas = document.createElement('canvas')
-        this.canvas.className = 'progress-canvas'
-        this.context = this.canvas.getContext('2d')
-        el('.game').appendChild(this.canvas)
+        this.progress = document.createElement('div')
+        this.progress.className = 'progress-canvases'
+        el('.game').appendChild(this.progress)
+
+        this.results = document.createElement('canvas')
+        this.results.className = 'progress-canvas'
+        this.progress.appendChild(this.results)
+
+        this.problem = document.createElement('canvas')
+        this.problem.className = 'progress-canvas progress-canvas-hide'
+        this.progress.appendChild(this.problem)
+
         this.div = document.createElement('div')
         this.div.className = 'progress'
         el('.game').appendChild(this.div)
         this.testSize()
         this.showNumbers()
         this.resize()
-        this.showResults()
     }
 
     resize() {
         const resolution = window.devicePixelRatio
-        this.canvas.width = this.canvas.offsetWidth * resolution
-        this.canvas.height = this.canvas.offsetHeight * resolution
-        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
-        this.context.restore()
-        this.context.save()
-        this.context.scale(resolution, resolution)
+        this.problem.width = this.results.width = window.innerWidth * resolution
+        this.problem.height = this.results.height = window.innerHeight * resolution
+
+        for (let i = 0; i < 2; i++) {
+            const context = i === 0 ? this.results.getContext('2d') : this.problem.getContext('2d')
+            context.restore()
+            context.save()
+            context.clearRect(0, 0, this.results.width, this.results.height)
+            context.scale(resolution, resolution)
+        }
     }
 
     showProblem(a: number, b: number) {
-        this.context.beginPath()
+        const context = this.problem.getContext('2d')
+        context.beginPath()
         const color = 'rgb(0,0,0,0.15)'
-        this.context.fillStyle = color
-        this.context.rect(0, this.ySize * (a + 1) - this.ySize / 2, this.xSize * (b + 0.5), this.ySize)
-        this.context.rect(this.xSize * (b + 1) - this.xSize / 2, 0, this.xSize, this.ySize * (a + 0.5))
-        this.context.fill()
-        this.context.beginPath()
-        this.context.strokeStyle = 'gray'
-        this.context.rect(this.xSize * (b + 0.5), this.ySize * (a + 0.5), this.xSize, this.ySize)
-        this.context.stroke()
+        context.clearRect(0, 0, this.problem.width, this.problem.height)
+        context.fillStyle = color
+        context.rect(0, this.ySize * (a + 1) - this.ySize / 2, this.xSize * (b + 0.5), this.ySize)
+        context.rect(this.xSize * (b + 1) - this.xSize / 2, 0, this.xSize, this.ySize * (a + 0.5))
+        context.fill()
+        context.beginPath()
+        context.strokeStyle = 'gray'
+        context.rect(this.xSize * (b + 0.5), this.ySize * (a + 0.5), this.xSize, this.ySize)
+        context.stroke()
+        this.problem.classList.remove('progress-canvas-hide')
     }
 
-    showResults() {
+    show() {
+        const context = this.results.getContext('2d')
+        context.clearRect(0, 0, this.results.width, this.results.height)
         for (let x = 0; x <= tables; x++) {
             for (let y = 0; y <= tables; y++) {
-                const result = random.get(1, true)
-                this.context.beginPath()
-                this.context.fillStyle = `rgba(0,255,0,${result * 0.5})`
-                this.context.rect(this.xSize * (x + 0.5), this.ySize * (y + 0.5), this.xSize, this.ySize)
-                this.context.fill()
+                const result = data.getResult(y, x).level / levels
+                context.beginPath()
+                context.fillStyle = `rgba(0,255,0,${result * 0.5})`
+                context.rect(this.xSize * (x + 0.5), this.ySize * (y + 0.5), this.xSize, this.ySize)
+                context.fill()
             }
         }
     }
 
-    show(a: number, b: number) {
-        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
+    start(a: number, b: number) {
         this.showProblem(a, b)
     }
 

@@ -1,0 +1,13 @@
+.help {
+    position: absolute;
+    top: calc(50% - 15rem);
+    left: 50%;
+    transform: translate(-50%, 0);
+    opacity: 1;
+    transition: opacity 2s;
+    user-select: none;
+}
+
+.help-hide {
+    opacity: 0;
+}

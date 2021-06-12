@@ -1,0 +1,20 @@
+.cheer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    user-select: none;
+}
+
+.cheer-kids {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.cheer-kid {
+    position: absolute;
+    max-width: 10vw;
+    max-height: 20vh;
+}

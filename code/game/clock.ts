@@ -1,17 +1,15 @@
 import { el } from '../el'
 import { game } from './game'
 
-const TIME = 10000
+const TIME = 20000
 const LINE_WIDTH = 5
 const CENTER_PERCENT = 0.025
 const ARC_PERCENT = 0.6
-const TICKS = 10
-const TICK_SIZE = 6
+const TICK_SIZE = 4
 
 enum ClockState {
     running,
     waiting,
-    complete,
 }
 
 class Clock {
@@ -26,7 +24,11 @@ class Clock {
         this.context = this.canvas.getContext('2d')
         this.canvas.className = 'clock'
         el('.game').appendChild(this.canvas)
-        this.canvas.addEventListener('pointerdown', () => this.start())
+        this.canvas.addEventListener('pointerdown', () => {
+            if (this.state === ClockState.waiting) {
+                game.start()
+            }
+        })
     }
 
     resize() {
@@ -35,21 +37,28 @@ class Clock {
         this.canvas.height = this.canvas.offsetHeight * resolution
     }
 
-    start() {
-        if (this.state === ClockState.waiting) {
-            game.start()
-        }
+    isRunning() {
+        return this.state === ClockState.running
     }
 
-    show(time: number) {
-        this.resize()
-        this.state = ClockState.waiting
+    start(time: number) {
+        this.state = ClockState.running
         this.goal = time
         this.time = 0
-        this.draw()
+        this.draw(false)
     }
 
-    draw() {
+    stop() {
+        this.state = ClockState.waiting
+    }
+
+    show() {
+        this.resize()
+        this.state = ClockState.waiting
+        this.draw(false)
+    }
+
+    draw(empty: boolean) {
         const width = this.canvas.width
         const height = this.canvas.height
 
@@ -58,23 +67,7 @@ class Clock {
         const centerX = width / 2
         const centerY = height / 2
 
-        this.context.beginPath()
-        this.context.strokeStyle = 'black'
-        this.context.lineWidth = LINE_WIDTH
-        this.context.arc(centerX, centerY, radius, 0, Math.PI * 2)
-        this.context.stroke()
-
         const arcSize = centerX * ARC_PERCENT
-        const angle = this.time / TIME * Math.PI * 2 - Math.PI / 2
-        const goalAngle = (this.goal / TIME) * Math.PI * 2 - Math.PI / 2
-        // draw gray arc
-        this.context.beginPath()
-        this.context.fillStyle = 'rgba(200,200,200,0.75)'
-        this.context.moveTo(centerX, centerY)
-        this.context.lineTo(centerX + Math.cos(angle) * arcSize, centerY + Math.sin(angle) * arcSize)
-        this.context.arc(centerX, centerY, arcSize, angle, goalAngle)
-        this.context.lineTo(centerX, centerY)
-        this.context.fill()
 
         // middle circle
         this.context.beginPath()
@@ -84,9 +77,10 @@ class Clock {
         this.context.fill()
 
         // draw ticks
-        const spacing = Math.PI * 2 / TICKS
+        const ticks = TIME / 1000
+        const spacing = Math.PI * 2 / ticks
         let tickAngle = -Math.PI / 2
-        for (let i = 0; i < TICKS; i++) {
+        for (let i = 0; i < ticks; i++) {
             this.context.beginPath()
             this.context.fillStyle = 'rgb(150,150,150)'
             const distance = arcSize - TICK_SIZE
@@ -98,11 +92,29 @@ class Clock {
             this.context.fill()
         }
 
-        // draw line
-        this.context.beginPath()
-        this.context.moveTo(centerX, centerY)
-        this.context.lineTo(centerX + Math.cos(angle) * arcSize, centerY + Math.sin(angle) * arcSize)
-        this.context.stroke()
+        if (!empty) {
+            this.context.beginPath()
+            this.context.strokeStyle = 'black'
+            this.context.lineWidth = LINE_WIDTH
+            this.context.arc(centerX, centerY, radius, 0, Math.PI * 2)
+            this.context.stroke()
+
+            const angle = this.time / TIME * Math.PI * 2 - Math.PI / 2
+            const goalAngle = (this.goal / TIME) * Math.PI * 2 - Math.PI / 2
+            // draw gray arc
+            this.context.beginPath()
+            this.context.fillStyle = 'rgba(200,200,200,0.75)'
+            this.context.moveTo(centerX, centerY)
+            this.context.lineTo(centerX + Math.cos(angle) * arcSize, centerY + Math.sin(angle) * arcSize)
+            this.context.arc(centerX, centerY, arcSize, angle, goalAngle)
+            this.context.lineTo(centerX, centerY)
+            this.context.fill()
+            // draw line
+            this.context.beginPath()
+            this.context.moveTo(centerX, centerY)
+            this.context.lineTo(centerX + Math.cos(angle) * arcSize, centerY + Math.sin(angle) * arcSize)
+            this.context.stroke()
+        }
     }
 
     update(elapsed: number) {
@@ -110,9 +122,9 @@ class Clock {
             this.time += elapsed
             if (this.time >= this.goal) {
                 this.time = this.goal
-                this.state = ClockState.complete
+                this.state = ClockState.waiting
             }
-            this.draw()
+            this.draw(false)
         }
     }
 }

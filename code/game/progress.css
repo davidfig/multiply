@@ -10,10 +10,6 @@
     width: fit-content;
 }
 
-.progress-numbers {
-    opacity: 0;
-}
-
 .progress-number {
     position: absolute;
     opacity: 0.5;
@@ -26,4 +22,10 @@
     left: 0;
     width: 100vw;
     height: 100vh;
+    opacity: 1;
+    transition: opacity 2s;
+}
+
+.progress-canvas-hide {
+    opacity: 0;
 }

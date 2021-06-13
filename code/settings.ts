@@ -2,6 +2,7 @@ export const tables = 12
 export const saveInterval = 500
 export const levels = 10
 
+export const fps = false
 export const clearStorage = false
 export const name = 'Multiplication Table'
 export const storageName = 'multiply-table'

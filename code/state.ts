@@ -1,4 +1,5 @@
 import { FPS } from 'yy-fps'
+import { fps } from './settings'
 import { menu } from './menu/menu'
 import { game } from './game/game'
 
@@ -17,7 +18,9 @@ class State {
         }
         this.state = 'menu'
         this.lastTime = performance.now()
-        this.fps = new FPS()
+        if (fps) {
+            this.fps = new FPS()
+        }
         requestAnimationFrame(() => this.update())
     }
 
@@ -45,7 +48,9 @@ class State {
         this.state.update(now - this.lastTime)
         this.lastTime = now
         requestAnimationFrame(() => this.update())
-        this.fps.frame()
+        if (this.fps) {
+            this.fps.frame()
+        }
     }
 }
 

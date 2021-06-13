@@ -9,7 +9,7 @@ export async function production() {
     const packageJson = await fs.readJson('./package.json')
     console.log(`Deploying ${packageJson.name}...`)
     const cache = `.${cuid.slug()}`
-    const dir = 'dist/'
+    const dir = 'docs/'
     await fs.emptyDir(dir)
     await buildAssets(dir, cache)
     await buildCss(dir, cache)

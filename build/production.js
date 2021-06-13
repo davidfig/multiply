@@ -1,7 +1,6 @@
 import fs from 'fs-extra'
 import cuid from 'cuid'
 
-import { log } from '../servers/shared/log'
 import { buildJs } from './js'
 import { buildCss } from './css'
 import { buildAssets } from './assets'

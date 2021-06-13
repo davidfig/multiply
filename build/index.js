@@ -1,10 +1,12 @@
 import childProcess from 'child_process'
 import chokidar from 'chokidar'
+import { production } from './production'
 // import killPort from 'kill-port'
 
 const index = 'build/dev.js'
 let _process, _lock
 
+const PRODUCTION = 'docs'
 const _waitToRestart = 250
 
 async function run(file) {
@@ -37,14 +39,20 @@ async function _restart() {
 }
 
 async function start() {
-    console.log('starting live-reload development server script')
-    const awaitWriteFinish = {
-        stabilityThreshold: 250,
-        pollInterval: 100
+    if (process.argv[2] === '--minify') {
+        console.log('building for production...')
+        await production()
+        process.exit(0)
+    } else {
+        console.log('starting live-reload development server script')
+        const awaitWriteFinish = {
+            stabilityThreshold: 250,
+            pollInterval: 100
+        }
+        run(true)
+        const watch = chokidar.watch(['build/**/*'], { awaitWriteFinish })
+        watch.on('change', file => run(file))
     }
-    run(true)
-    const watch = chokidar.watch(['build/**/*'], { awaitWriteFinish })
-    watch.on('change', file => run(file))
 }
 
 start()

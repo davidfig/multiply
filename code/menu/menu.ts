@@ -35,6 +35,7 @@ class Menu {
     add(name: string): boolean {
         if (data.isValid(name)) {
             data.add(name)
+            this.addPlayer(name)
             return true
         }
         el('.menu-add-player-edit').classList.add('menu-add-player-invalid')

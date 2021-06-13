@@ -10,10 +10,12 @@ Play the game on github at https://davidfig.github.io/multiply
 
 ## Local Installation
 
-`git clone https://github.com/davidfig/multiply`
-`cd multiply`
-`npm install`
-`npm start`
+```
+git clone https://github.com/davidfig/multiply
+cd multiply
+npm install
+npm start
+```
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/) by David Figatner at [yopeyopey.com](https://yopeyopey.com/).

@@ -15,7 +15,7 @@ class State {
         for (const key in this.states) {
             this.states[key].init()
         }
-        this.state = 'game'
+        this.state = 'menu'
         this.lastTime = performance.now()
         this.fps = new FPS()
         requestAnimationFrame(() => this.update())

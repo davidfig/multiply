@@ -100,6 +100,7 @@ export class Answer {
     nextMove(speed = SPEED) {
         const to = this.findPlace()
         const distance = dist(this.position, to)
+        animejs.remove(this.div)
         animejs({
             targets: this.div,
             translateX: to.x,
@@ -128,32 +129,5 @@ export class Answer {
     get y() {
         const translateY = animejs.get(this.div, 'translateY')
         return translateY ? parseInt(translateY as string) : 0
-    }
-
-    rightAnswer(index: number) {
-        this.to = problem.getPosition(index)
-        this.answer()
-    }
-
-    wrongAnswer(): number | null {
-        if (this.state === AnswerState.answered) {
-            this.state = AnswerState.wrong
-            this.to = { x: this.to.x, y: this.to.y + this.div.offsetHeight }
-            this.nextMove(ANSWER_SPEED)
-            this.div.classList.remove('number-selected')
-            return null
-        }
-        return this.number
-    }
-
-    wrongAnswerLeave() {
-        if (this.state === AnswerState.wrongComplete) {
-            this.state = AnswerState.normal
-            this.clear()
-        }
-    }
-
-    place() {
-        this.div.style.transform = `translateX(${this._x}px) translateY(${this._y}px)`
     }
 }
